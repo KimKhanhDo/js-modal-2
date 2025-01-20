@@ -56,11 +56,8 @@ function Modal(options = {}) {
         });
 
         if (this._allowButtonClose) {
-            const closeBtn = document.createElement("button");
-            closeBtn.className = "modal-close";
-            closeBtn.innerHTML = "&times;";
+            const closeBtn = this._createButton("&times;", "modal-close", this.close);
             container.append(closeBtn);
-            closeBtn.onclick = () => this.close();
         }
 
         const modalContent = document.createElement("div");
@@ -72,16 +69,9 @@ function Modal(options = {}) {
             this._modalFooter = document.createElement("footer");
             this._modalFooter.className = "modal-footer";
 
-            if (this._footerContent) {
-                this._modalFooter.innerHTML = this._footerContent;
-            }
-
-            // loop through button array & append each btn to the modalFooter
-            this._footerButtons.forEach((btn) => {
-                this._modalFooter.append(btn);
-            });
-
-            container.append(this._modalFooter);
+            this._renderFooterContent();
+            this._renderFooterButtons();
+            container.append(this._modalFooter); // loop through btn array & append each btn to the modalFooter
         }
 
         // Append elements to complete the backdrop
@@ -91,14 +81,23 @@ function Modal(options = {}) {
 
     this._footerButtons = [];
 
-    this.addFooterButton = (title, cssClass, callback) => {
-        const footerBtn = document.createElement("button");
-        footerBtn.className = cssClass;
-        footerBtn.innerHTML = title;
-        footerBtn.onclick = callback;
-        this._footerButtons.push(footerBtn);
+    this._createButton = (title, cssClass, callback) => {
+        const button = document.createElement("button");
+        button.className = cssClass;
+        button.innerHTML = title;
+        button.onclick = callback;
 
-        // support add new footer's buttons when modal is opening
+        return button;
+    };
+
+    this.addFooterButton = (title, cssClass, callback) => {
+        const footerBtn = this._createButton(title, cssClass, callback);
+        this._footerButtons.push(footerBtn);
+        this._renderFooterButtons();
+    };
+
+    this._renderFooterButtons = () => {
+        // support add new footer's buttons while modal is opening
         if (this._modalFooter) {
             this._footerButtons.forEach((btn) => {
                 this._modalFooter.append(btn);
@@ -106,13 +105,16 @@ function Modal(options = {}) {
         }
     };
 
+    this._renderFooterContent = () => {
+        // condition to support adjust new footer's content while modal is opening
+        if (this._modalFooter && this._footerContent) {
+            this._modalFooter.innerHTML = this._footerContent;
+        }
+    };
+
     this.setFooterContent = (html) => {
         this._footerContent = html;
-
-        // support adjust new footer's content when modal is opening
-        if (this._modalFooter) {
-            this._modalFooter.innerHTML = html;
-        }
+        this._renderFooterContent();
     };
 
     this.open = () => {
@@ -125,7 +127,7 @@ function Modal(options = {}) {
 
         //  Preventing scrolling
         document.body.classList.add("no-scroll");
-        document.body.style.paddingRight = getScrolbarlWidth() + "px";
+        document.body.style.paddingRight = this._getScrolbarlWidth() + "px";
 
         setTimeout(() => {
             this._backdrop.classList.add("show");
@@ -143,9 +145,7 @@ function Modal(options = {}) {
             document.addEventListener("keydown", this._handleEscapeKey);
         }
 
-        this._onTransitionEnd(() => {
-            if (typeof onOpen === "function") onOpen();
-        });
+        this._onTransitionEnd(onOpen);
 
         return this._backdrop;
     };
@@ -199,8 +199,8 @@ function Modal(options = {}) {
         };
     };
 
-    function getScrolbarlWidth() {
-        if (getScrolbarlWidth.value) return getScrolbarlWidth.value;
+    this._getScrolbarlWidth = () => {
+        if (this._scrolbarlWidth) return this._scrolbarlWidth;
 
         const div = document.createElement("div");
         Object.assign(div.style, {
@@ -210,12 +210,11 @@ function Modal(options = {}) {
         });
 
         document.body.appendChild(div);
-        const scrollbarWidth = div.offsetWidth - div.clientWidth;
-        getScrolbarlWidth.value = scrollbarWidth;
+        this._scrolbarlWidth = div.offsetWidth - div.clientWidth;
         document.body.removeChild(div);
 
-        return scrollbarWidth;
-    }
+        return this._scrolbarlWidth;
+    };
 }
 
 // Test modal1
