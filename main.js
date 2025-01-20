@@ -96,14 +96,20 @@ function Modal(options = {}) {
         footerBtn.className = cssClass;
         footerBtn.innerHTML = title;
         footerBtn.onclick = callback;
-
         this._footerButtons.push(footerBtn);
+
+        // support add new footer's buttons when modal is opening
+        if (this._modalFooter) {
+            this._footerButtons.forEach((btn) => {
+                this._modalFooter.append(btn);
+            });
+        }
     };
 
     this.setFooterContent = (html) => {
         this._footerContent = html;
 
-        // support changing new footer's content when modal is opening
+        // support adjust new footer's content when modal is opening
         if (this._modalFooter) {
             this._modalFooter.innerHTML = html;
         }
