@@ -1,8 +1,8 @@
 /**
- *  <div class="modal-backdrop">
-        <div class="modal-container">
-            <button class="modal-close">&times;</button>
-            <div class="modal-content">
+ *  <div class="popzy__backdrop">
+        <div class="popzy__container">
+            <button class="popzy__close">&times;</button>
+            <div class="popzy__content">
                 .....
             </div>
         </div>
@@ -17,9 +17,9 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
-Modal.elements = [];
+Popzy.elements = [];
 
-function Modal(options = {}) {
+function Popzy(options = {}) {
     this.opt = Object.assign(
         {
             // templateId,
@@ -49,14 +49,14 @@ function Modal(options = {}) {
     this._handleEscapeKey = this._handleEscapeKey.bind(this);
 }
 
-Modal.prototype.build = function () {
+Popzy.prototype.build = function () {
     // Create elements
     const content = this.template.content.cloneNode(true);
     this._backdrop = document.createElement("div");
-    this._backdrop.className = "modal-backdrop";
+    this._backdrop.className = "popzy__backdrop";
 
     const container = document.createElement("div");
-    container.className = "modal-container";
+    container.className = "popzy__container";
 
     this.opt.cssClass.forEach((className) => {
         if (typeof className === "string") {
@@ -65,18 +65,18 @@ Modal.prototype.build = function () {
     });
 
     if (this._allowButtonClose) {
-        const closeBtn = this._createButton("&times;", "modal-close", () => this.close());
+        const closeBtn = this._createButton("&times;", "popzy__close", () => this.close());
         container.append(closeBtn);
     }
 
     const modalContent = document.createElement("div");
-    modalContent.className = "modal-content";
+    modalContent.className = "popzy__content";
     modalContent.append(content);
     container.append(modalContent);
 
     if (this.opt.footer) {
         this._modalFooter = document.createElement("footer");
-        this._modalFooter.className = "modal-footer";
+        this._modalFooter.className = "popzy__footer";
 
         this._renderFooterContent();
         this._renderFooterButtons();
@@ -88,7 +88,7 @@ Modal.prototype.build = function () {
     document.body.append(this._backdrop);
 };
 
-Modal.prototype._createButton = function (title, cssClass, callback) {
+Popzy.prototype._createButton = function (title, cssClass, callback) {
     const button = document.createElement("button");
     button.className = cssClass;
     button.innerHTML = title;
@@ -98,13 +98,13 @@ Modal.prototype._createButton = function (title, cssClass, callback) {
     return button;
 };
 
-Modal.prototype.addFooterButton = function (title, cssClass, callback) {
+Popzy.prototype.addFooterButton = function (title, cssClass, callback) {
     const footerBtn = this._createButton(title, cssClass, callback);
     this._footerButtons.push(footerBtn);
     this._renderFooterButtons();
 };
 
-Modal.prototype._renderFooterButtons = function () {
+Popzy.prototype._renderFooterButtons = function () {
     // support add new footer's buttons while modal is opening
     if (this._modalFooter) {
         this._footerButtons.forEach((btn) => {
@@ -113,32 +113,32 @@ Modal.prototype._renderFooterButtons = function () {
     }
 };
 
-Modal.prototype._renderFooterContent = function () {
+Popzy.prototype._renderFooterContent = function () {
     // condition to support adjust new footer's content while modal is opening
     if (this._modalFooter && this._footerContent) {
         this._modalFooter.innerHTML = this._footerContent;
     }
 };
 
-Modal.prototype.setFooterContent = function (html) {
+Popzy.prototype.setFooterContent = function (html) {
     this._footerContent = html;
     this._renderFooterContent();
 };
 
-Modal.prototype.open = function () {
+Popzy.prototype.open = function () {
     // push obj Modal into an array everytime this.open is triggered
-    Modal.elements.push(this);
+    Popzy.elements.push(this);
 
     if (!this._backdrop) {
         this.build();
     }
 
     //  Preventing scrolling
-    document.body.classList.add("no-scroll");
+    document.body.classList.add("popzy--no-scroll");
     document.body.style.paddingRight = this._getScrolbarlWidth() + "px";
 
     setTimeout(() => {
-        this._backdrop.classList.add("show");
+        this._backdrop.classList.add("popzy--show");
     }, 0);
 
     if (this._allowBackdropClose) {
@@ -162,22 +162,22 @@ Modal.prototype.open = function () {
 };
 
 // create function & save the reference to this._handleEscapeKey
-Modal.prototype._handleEscapeKey = function (e) {
+Popzy.prototype._handleEscapeKey = function (e) {
     console.log(this);
 
-    const lastModal = Modal.elements[Modal.elements.length - 1];
+    const lastModal = Popzy.elements[Popzy.elements.length - 1];
     if ((e.key === "Escape") & (this === lastModal)) {
         this.close();
     }
 };
 
-Modal.prototype.close = function (isDestroyed = this.opt.destroyOnClose) {
+Popzy.prototype.close = function (isDestroyed = this.opt.destroyOnClose) {
     // remove obj Modal everytime this.close is triggered
-    Modal.elements.pop();
+    Popzy.elements.pop();
 
     // console.log(this);
 
-    this._backdrop.classList.remove("show");
+    this._backdrop.classList.remove("popzy--show");
 
     // once this.close triggered -> remove event listener
     if (this._allowEscapeClose) {
@@ -195,18 +195,18 @@ Modal.prototype.close = function (isDestroyed = this.opt.destroyOnClose) {
         if (typeof this.opt.onClose === "function") this.opt.onClose();
 
         // Condition to enable scrolling when opening multi modals at the same time
-        if (!Modal.elements.length) {
-            document.body.classList.remove("no-scroll");
+        if (!Popzy.elements.length) {
+            document.body.classList.remove("popzy--no-scroll");
             document.body.style.paddingRight = "";
         }
     });
 };
 
-Modal.prototype.destroy = function () {
+Popzy.prototype.destroy = function () {
     this.close(true);
 };
 
-Modal.prototype._onTransitionEnd = function (callback) {
+Popzy.prototype._onTransitionEnd = function (callback) {
     this._backdrop.ontransitionend = (e) => {
         // Guard against multiple transitions
         if (e.propertyName !== "transform") return;
@@ -214,7 +214,7 @@ Modal.prototype._onTransitionEnd = function (callback) {
     };
 };
 
-Modal.prototype._getScrolbarlWidth = function () {
+Popzy.prototype._getScrolbarlWidth = function () {
     if (this._scrolbarlWidth) return this._scrolbarlWidth;
 
     const div = document.createElement("div");
@@ -232,7 +232,7 @@ Modal.prototype._getScrolbarlWidth = function () {
 };
 
 // Test modal1
-const modal1 = new Modal({
+const modal1 = new Popzy({
     templateId: "modal-1",
     destroyOnClose: false,
     onOpen: () => {
@@ -248,7 +248,7 @@ $("#open-modal-1").onclick = () => {
 };
 
 // Test modal2
-const modal2 = new Modal({
+const modal2 = new Popzy({
     templateId: "modal-2",
     // closeMethods: ["button", "escape"],
     cssClass: ["class1", "class2", "classN", 123],
@@ -277,7 +277,7 @@ $("#open-modal-2").onclick = () => {
 };
 
 // Test modal 3
-const modal3 = new Modal({
+const modal3 = new Popzy({
     templateId: "modal-3",
     closeMethods: [],
     footer: true,
@@ -295,19 +295,19 @@ $("#open-modal-3").onclick = () => {
 
 // modal3.setFooterContent("<h2>Hello</h2>");
 
-modal3.addFooterButton("Danger", "modal-btn danger pull-left", (e) => {
+modal3.addFooterButton("Danger", "popzy__btn popzy__btn--danger popzy__btn--pull-left", (e) => {
     alert("Danger clicked!");
 });
 
-modal3.addFooterButton("Cancel", "modal-btn", (e) => {
+modal3.addFooterButton("Cancel", "popzy__btn", (e) => {
     modal3.close();
 });
 
-modal3.addFooterButton("<span>Agree</span>", "modal-btn primary", (e) => {
+modal3.addFooterButton("<span>Agree</span>", "popzy__btn popzy__btn--primary", (e) => {
     // Handle something
     modal3.close();
 });
 
-// modal.close() -> remove class "show" only
-// modal.destroy() -> remove class show + modal out of DOM
-// only escape + modal.destroy() -> error
+// Popzy.close() -> remove class "show" only
+// Popzy.destroy() -> remove class show + modal out of DOM
+// only escape + Popzy.destroy() -> error

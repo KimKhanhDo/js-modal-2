@@ -53,7 +53,7 @@ article img {
     max-width: 100%;
 }
 
-.modal-backdrop {
+.popzy__backdrop {
     position: fixed;
     inset: 0;
     display: flex;
@@ -66,16 +66,16 @@ article img {
     transition-duration: 0.3s;
 }
 
-.modal-backdrop.show {
+.popzy--show {
     opacity: 1;
     visibility: visible;
 }
 
-.modal-backdrop.show .modal-container {
+.popzy--show .popzy__container {
     transform: scale(1);
 }
 
-.modal-container {
+.popzy__container {
     position: relative;
     width: min(600px, 90%);
     padding: 20px 20px 0;
@@ -85,7 +85,7 @@ article img {
     transition: transform 0.3s;
 }
 
-.modal-close {
+.popzy__close {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -97,41 +97,41 @@ article img {
     font-size: 2rem;
 }
 
-.modal-close:hover {
+.popzy__close:hover {
     color: #333;
 }
 
-.modal-content {
+.popzy__content {
     margin-right: 20px;
     max-height: 80vh;
     overflow-y: auto;
 }
 
-.no-scroll {
-    overflow: hidden;
-}
-
-.modal-footer {
+.popzy__footer {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
     padding: 20px 0;
 }
 
-.modal-btn {
+.popzy__btn {
     padding: 8px 20px;
     background: #464e63;
     color: #fff;
 }
 
-.modal-btn.primary {
+.popzy__btn--primary {
     background: #377aad;
 }
 
-.modal-btn.danger {
+.popzy__btn--danger {
     background: #cc4e27;
 }
 
-.modal-btn.pull-left {
+.popzy__btn--pull-left {
     margin-right: auto;
+}
+
+.popzy--no-scroll {
+    overflow: hidden;
 }
